@@ -1,0 +1,122 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+  <div class="main_container">
+       <div>
+        <h1><%=list.title %></h1> 
+        <div class="container">
+            <img class="img_container" width="100%" height="100%" src=<%=list.image.url %> alt="img">
+            <p class="card-text"><i><%=list.owner.username %></i></p>
+            <div class="pad"> <h3><%=list.title %></h3> <h3>Price :RS. <%=list.price %></h3></div>
+            <p class="pad"><%=list.description %></p>
+            <div class="pad"><p>location : <%=list.location %></p> <p>country : <%= list.country %></p></div>
+            <% if(newUser && newUser._id.equals(list.owner._id)){ %>
+              <div>
+               <div class="modify_container">
+                <form action="/listings">
+                  <button class="btn btn-outline-primary">               
+                    Back
+                 </button>
+                </form>
+                <form action="/listings/<%=list._id %>/edit">
+                  <button class="btn btn-outline-primary">               
+                     Edit
+                  </button>
+                </form>
+              </div>
+               <form class="modify_container" action="/listings/<%=list._id %>?_method=DELETE" method="post">
+                <button class="btn btn-outline-danger">Delete</button>
+               </form>
+              </div>
+            <%} %>
+        </div>
+      </div>
+      <% if(newUser){%>
+        <hr>
+        <div class="mb-3 mt-3">
+          <h2 style="color: black;">Leave Rating </h2>
+          <br>
+          <form class="needs-validation" novalidate action="/listings/<%=list._id%>/reviews" method="post">
+            <!-- <div class="mb-3 mt-3">
+                <label for="customRange1" class="form-label"> Rating</label>
+                <input type="range" min="1" max="5" class="form-range" id="rating" name="review[rating]">
+            </div> -->
+            <fieldset class="starability-slot">
+              <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+              <input type="radio" id="first-rate1" name="review[rating]"value="1" />
+              <label for="first-rate1" title="Terrible">1 star</label>
+              <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+              <label for="first-rate2" title="Not good">2 stars</label>
+              <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+              <label for="first-rate3" title="Average">3 stars</label>
+              <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+              <label for="first-rate4" title="Very good">4 stars</label>
+              <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+              <label for="first-rate5" title="Amazing">5 stars</label>
+            </fieldset>
+            <div class="mb-3 mt-3">
+                <label for="comment" class="form-label ">Comment</label>
+                <textarea class="form-control" rows="5" name="review[comment]" id="comment" required></textarea>
+                <div class="invalid-feedback">Please add some comments on review</div>
+            </div>
+             <button class="btn btn-outline-primary">Submit</button>
+           </form>
+        </div>
+      <%} %>
+      
+      <% if(list.reviews.length){ %>
+        <hr>
+      <div>
+        <h2>All Reviews</h2>
+        <div class="row">
+      <%   for(let review of list.reviews){ %>
+        <div class="review-container card col-5 m-2">
+             <div class="card-body">
+                <h5 class="card-title">@<%= review.author.username %></h5>
+                <p class="starability-result" data-rating="<%= review.rating %>">
+                </p>
+                <p class="card-text">
+                     <%=review.comment %>
+                </p>
+             </div>
+             <form class="m-2" action="/listings/<%=list._id %>/reviews/<%=review._id %>?_method=DELETE" method="post">
+                <button class="btn btn-sm btn-outline-danger">Delete</button>
+             </form>
+             </div>
+      <%   }%>
+       </div>
+      </div>
+      <% } %>
+
+      <div id="map" style="height: 400px; width: 100%; padding: 10px; margin-top: 20px;"></div>
+     
+    </div>
+    <script>
+      const latitude = <%= JSON.stringify(list.latitude) %>;
+      const longitude = <%= JSON.stringify(list.longitude) %>;
+  
+      const map = L.map('map').setView([latitude, longitude], 15); // Set higher zoom for better detail
+
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 15,
+      attribution: '&copy; <a href="https://www.esri.com/">ESRI</a>, <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+
+  
+      // Add a marker to the map
+      L.marker([latitude, longitude]).addTo(map)
+          .bindPopup('<%= list.title %>')
+          .openPopup();
+  </script>
+  
+  
+</body>
+</html> 
+
+
