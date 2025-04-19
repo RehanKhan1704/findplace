@@ -33,6 +33,8 @@ async function main(){
     mongoose.connect(db_url,, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+        ssl: true,
+  sslValidate: true,
 });
 }
 
